@@ -1,35 +1,100 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
+import Menu from "./pages/Menu";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Kitchen from "./pages/Kitchen";
+import Analytics from "./pages/Analytics";
 
 export default function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="p-8 text-center">
-      {/* Your gradient heading */}
-      <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent mb-8">
-        Tailwind is Configured Correctly!
-      </h1>
+    <BrowserRouter>
+      {/* Navigation Bar */}
+      <nav className="bg-white shadow-md w-full fixed top-0 left-0 right-0 z-50">
+        <div className="flex justify-center gap-8 py-4">
+          <NavLink
+            to="/menu"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-blue-100 text-blue-700 border-b-2 border-blue-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
+              }`
+            }
+          >
+            🍔 Menu
+          </NavLink>
 
-      {/* Original Vite content */}
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text ">
-      Tailwind is working!
-    </h1>
-        </button>
-      </div>
-    </div>
+          <NavLink
+            to="/cart"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-green-100 text-green-700 border-b-2 border-green-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
+              }`
+            }
+          >
+            🛒 Cart
+          </NavLink>
+
+          <NavLink
+            to="/checkout"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-green-100 text-green-700 border-b-2 border-green-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
+              }`
+            }
+          >
+            💳 Checkout
+          </NavLink>
+
+          <NavLink
+            to="/kitchen"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-green-100 text-green-700 border-b-2 border-green-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
+              }`
+            }
+          >
+            👨‍🍳 Kitchen
+          </NavLink>
+
+          <NavLink
+            to="/analytics"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-green-100 text-green-700 border-b-2 border-green-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
+              }`
+            }
+          >
+            📊 Analytics
+          </NavLink>
+          
+        </div>
+      </nav>
+              
+      {/* Page Content */}
+      <main className="max-w-6xl mx-auto p-6 pt-24">
+        <Routes>
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/kitchen" element={<Kitchen />} />
+          <Route path="/analytics" element={<Analytics />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
+    
   );
 }
