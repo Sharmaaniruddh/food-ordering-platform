@@ -4,6 +4,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Kitchen from "./pages/Kitchen";
 import Analytics from "./pages/Analytics";
+import OrderTracker from "./pages/OrderTracker";
 
 export default function App() {
   return (
@@ -37,6 +38,20 @@ export default function App() {
             }
           >
             🛒 Cart
+          </NavLink>
+
+            <NavLink
+            to="/order-tracker"
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-lg transition-all font-medium text-sm
+              ${
+                isActive
+                  ? "bg-indigo-100 text-indigo-700 border-b-2 border-indigo-500"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-indigo-600"
+              }`
+            }
+          >
+            🚚 Tracker
           </NavLink>
 
           <NavLink
@@ -89,6 +104,7 @@ export default function App() {
         <Routes>
           <Route path="/menu" element={<Menu />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/order-tracker" element={<OrderTracker />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/kitchen" element={<Kitchen />} />
           <Route path="/analytics" element={<Analytics />} />
