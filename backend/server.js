@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-
+const { broadcastOrder } = require("./wsServer");
 app.use(cors());
 app.use(express.json());
 
@@ -11,9 +11,22 @@ app.use("/menu", menuRoute);
 // JSON-RPC: /rpc
 app.post("/rpc", (req, res) => {
   const { method, params, id } = req.body;
+  
+  
 
   if (method === "placeOrder") {
     console.log("✅ New Order:", params);
+
+
+    broadcastOrder("order_created", {
+    name: params.customer.name,
+    phone: params.customer.phone,
+    address: params.customer.address,
+    cart: params.items.map(item => ({
+    name: item.name,
+    qty: item.quantity,
+    }))
+    });
 
     // Later insert into DB
     return res.json({
