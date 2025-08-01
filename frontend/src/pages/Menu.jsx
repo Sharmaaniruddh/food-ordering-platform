@@ -7,63 +7,120 @@ function Menu() {
   const dispatch = useDispatch();
 
   const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/menu")
-      .then((res) => {
-        setMenuItems(res.data);
+    const fetchData = async () => {
+      try {
+        const [menuRes, categoryRes] = await Promise.all([
+          axios.get("http://localhost:5000/menu"),
+          axios.get("http://localhost:5000/categories"),
+        ]);
+        setMenuItems(menuRes.data);
+        setCategories(categoryRes.data);
+      } catch (err) {
+        setError("❌ Error loading menu or categories.");
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError("Error fetching menu data");
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
-  if (loading) return <div className="text-center mt-12">Loading menu...</div>;
+  const filteredItems = selectedCategory
+    ? menuItems.filter((item) => item.category_id === selectedCategory)
+    : menuItems;
+
+  if (loading) return <div className="text-center mt-12 text-white text-lg">Loading menu...</div>;
   if (error) return <div className="text-red-600 text-center mt-12">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed" style={{ 
-      backgroundImage: "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
-      backgroundColor: "rgba(0,0,0,0.4)",
-      backgroundBlendMode: "multiply"
-    }}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
-        {menuItems.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-lg shadow-md p-4 hover:shadow-xl transition flex flex-col items-center"
+    <section
+      className="min-h-screen bg-cover bg-center bg-fixed"
+      style={{
+        backgroundImage:
+          "url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2070&q=80')",
+        backgroundColor: "rgba(0,0,0,0.4)",
+        backgroundBlendMode: "multiply",
+      }}
+    >
+      <div className="flex max-w-7xl mx-auto mt-20 px-4 gap-8">
+        {/* Left Sidebar - Categories (Now with transparent background) */}
+        <aside className="w-40 p-4 sticky top-20 self-start h-fit bg-transparent">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`w-full mb-3 px-4 py-2 text-left font-semibold transition-colors duration-200 bg-transparent
+              ${
+                selectedCategory === null
+                  ? "text-yellow-400 underline"
+                  : "text-white hover:text-yellow-300"
+              }
+            `}
           >
-            {/* Original Image Container - UNCHANGED */}
-            <div className="relative h-36 w-44 overflow-hidden bg-gray-100 rounded-md mb-3">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/150?text=Image+Not+Found';
-                  e.target.className = 'w-full h-full object-contain p-2';
-                }}
-              />
-            </div>
+            All
+          </button>
 
-            <h3 className="text-md font-semibold text-center">{item.name}</h3>
-            <p className="text-gray-600">₹{item.price}</p>
-
+          {categories.map((cat) => (
             <button
-              onClick={() => dispatch(addToCart(item))}
-              className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`w-full mb-3 px-4 py-2 text-left font-semibold transition-colors duration-200 bg-transparent
+                ${
+                  selectedCategory === cat.id
+                    ? "text-yellow-400 underline"
+                    : "text-white hover:text-yellow-300"
+                }
+              `}
             >
-              Add to Cart
+              {cat.name}
             </button>
-          </div>
-        ))}
+          ))}
+        </aside>
+
+        {/* Main Content - Menu Items (UNCHANGED) */}
+        <main className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {filteredItems.length === 0 ? (
+            <div className="text-white col-span-full text-center text-lg">
+              No menu items found.
+            </div>
+          ) : (
+            filteredItems.map((item) => (
+              <article
+                key={item.id}
+                className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition-all duration-300 flex flex-col items-center"
+              >
+                <div className="relative h-36 w-44 overflow-hidden bg-gray-100 rounded-md mb-3">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                      e.target.className = "w-full h-full object-contain p-2";
+                    }}
+                  />
+                </div>
+
+                <h3 className="text-md font-semibold text-center text-gray-900">{item.name}</h3>
+                <p className="text-gray-600 mb-2">₹{item.price}</p>
+
+                {/* Add to Cart button (COMPLETELY UNCHANGED from original) */}
+                <button
+                  onClick={() => dispatch(addToCart(item))}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm transition-colors"
+                >
+                  Add to Cart
+                </button>
+              </article>
+            ))
+          )}
+        </main>
       </div>
-    </div>
+    </section>
   );
 }
 

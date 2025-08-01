@@ -5,6 +5,8 @@ import Checkout from "./pages/Checkout";
 import Kitchen from "./pages/Kitchen";
 import Analytics from "./pages/Analytics";
 import OrderTracker from "./pages/OrderTracker";
+import LandingPage from "./pages/LandingPage";
+import AdminLanding from "./pages/AdminLanding";
 
 export default function App() {
   return (
@@ -102,6 +104,8 @@ export default function App() {
       {/* Page Content */}
       <main className="max-w-6xl mx-auto p-6 pt-24">
         <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/admin" element={<AdminLanding />} />"
           <Route path="/menu" element={<Menu />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order-tracker" element={<OrderTracker />} />

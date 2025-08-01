@@ -5,6 +5,13 @@ const { broadcastOrder } = require("./wsServer");
 app.use(cors());
 app.use(express.json());
 
+
+
+
+const categoryRoute = require("./routes/categories");
+app.use("/categories", categoryRoute);
+
+
 const menuRoute = require("./routes/menu");
 app.use("/menu", menuRoute);
 
