@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function Kitchen() {
   const [orders, setOrders] = useState([]);
+  const socketRef = useRef(null); // Step 1: create socketRef
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:5001");
+    // Step 3: connect to backend inside docker using 'backend' hostname
+    socketRef.current = new WebSocket("ws://localhost:5001");
 
-    socket.onopen = () => console.log("👨‍🍳 Kitchen WebSocket connected");
+    socketRef.current.onopen = () => console.log("👨‍🍳 Kitchen WebSocket connected");
 
-    socket.onmessage = (event) => {
+    socketRef.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
 
       if (message.event === "order_created") {
@@ -26,22 +28,28 @@ function Kitchen() {
       }
     };
 
-    socket.onclose = () => console.log("❌ Kitchen WebSocket disconnected");
+    socketRef.current.onclose = () => console.log("❌ Kitchen WebSocket disconnected");
 
-    return () => socket.close();
+    // Cleanup on component unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
   }, []);
 
+  // Step 2: Send updates through the same socketRef connection
   const sendStatusUpdate = (order, newStatus) => {
-    const socket = new WebSocket("ws://localhost:5001");
-
-    socket.onopen = () => {
-      socket.send(
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
         JSON.stringify({
           event: "order_updated",
-          data: { ...order, status: newStatus }
+          data: { ...order, status: newStatus },
         })
       );
-    };
+    } else {
+      console.error("WebSocket is not connected.");
+    }
   };
 
   return (
@@ -56,15 +64,24 @@ function Kitchen() {
             <div
               key={index}
               className={`p-4 rounded-lg shadow-lg border-2 ${
-                order.status === "Prepared" ? "border-green-500 bg-green-50" :
-                order.status === "Rejected" ? "border-red-500 bg-red-50" :
-                "border-yellow-400 bg-white"
+                order.status === "Prepared"
+                  ? "border-green-500 bg-green-50"
+                  : order.status === "Rejected"
+                  ? "border-red-500 bg-red-50"
+                  : "border-yellow-400 bg-white"
               }`}
             >
               <h4 className="font-semibold text-lg mb-2">👤 {order.name}</h4>
-              <p><strong>Phone:</strong> {order.phone}</p>
-              <p><strong>Items:</strong> {order.cart?.map(item => `${item.name} x${item.qty}`).join(", ")}</p>
-              <p><strong>Status:</strong> {order.status}</p>
+              <p>
+                <strong>Phone:</strong> {order.phone}
+              </p>
+              <p>
+                <strong>Items:</strong>{" "}
+                {order.cart?.map((item) => `${item.name} x${item.qty}`).join(", ")}
+              </p>
+              <p>
+                <strong>Status:</strong> {order.status}
+              </p>
 
               {order.status === "Pending" && (
                 <div className="mt-3 flex gap-2">

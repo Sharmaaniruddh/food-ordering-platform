@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+require("./wsServer"); // ⬅️ THIS will actually start the WebSocket server
+
 const pool = require("./db"); // your PostgreSQL connection pool
 const { broadcastOrder } = require("./wsServer");
 app.use(cors());
@@ -47,6 +49,7 @@ app.post("/rpc", async (req, res) => {
 
       // Send WebSocket event to Kitchen
       broadcastOrder("order_created", {
+        timestamp: Date.now(),
         name,
         phone,
         address,

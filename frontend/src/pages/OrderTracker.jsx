@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function OrderTracker() {
   const [orders, setOrders] = useState([]);
+  const socketRef = useRef(null); // ✅ keep reference to socket
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:5001");
+    // ✅ Use Docker internal hostname
+    socketRef.current = new WebSocket("ws://localhost:5001");
 
-    socket.onopen = () => {
+    socketRef.current.onopen = () => {
       console.log("📡 Connected to WebSocket server");
     };
 
-    socket.onmessage = (event) => {
+    socketRef.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
       console.log("📨 Received message:", message);
 
@@ -31,11 +33,15 @@ function OrderTracker() {
       }
     };
 
-    socket.onclose = () => {
+    socketRef.current.onclose = () => {
       console.log("❌ WebSocket disconnected");
     };
 
-    return () => socket.close(); // cleanup
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
   }, []);
 
   return (
