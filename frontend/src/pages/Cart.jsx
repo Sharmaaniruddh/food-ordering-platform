@@ -44,7 +44,7 @@ function Cart() {
       <Background3D />
 
       <div className="relative z-10 space-y-4 bg-gray-900 bg-opacity-90 rounded-xl p-6 shadow-xl max-w-2xl mx-auto mt-10 border border-gray-700 text-white">
-        <h2 className="text-2xl font-bold mb-4 text-white">🛒 Your Cart</h2>
+        <h4 className="text-2xl font-bold mb-4 text-white">🛒 Your Cart</h4>
 
         {cartItems.length === 0 ? (
           <p className="text-gray-300">Cart is empty. Add something from the Menu.</p>

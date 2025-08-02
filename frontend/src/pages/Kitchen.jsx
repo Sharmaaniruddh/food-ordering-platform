@@ -10,9 +10,19 @@ function Kitchen() {
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+
       if (message.event === "order_created") {
         const order = { ...message.data, status: "Pending" };
         setOrders((prev) => [...prev, order]);
+      }
+
+      if (message.event === "order_updated") {
+        const updated = message.data;
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.timestamp === updated.timestamp ? { ...o, status: updated.status } : o
+          )
+        );
       }
     };
 
@@ -21,15 +31,22 @@ function Kitchen() {
     return () => socket.close();
   }, []);
 
-  const updateStatus = (index, newStatus) => {
-    const updatedOrders = [...orders];
-    updatedOrders[index].status = newStatus;
-    setOrders(updatedOrders);
+  const sendStatusUpdate = (order, newStatus) => {
+    const socket = new WebSocket("ws://localhost:5001");
+
+    socket.onopen = () => {
+      socket.send(
+        JSON.stringify({
+          event: "order_updated",
+          data: { ...order, status: newStatus }
+        })
+      );
+    };
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">👨‍🍳 Kitchen Dashboard</h2>
+      <h4 className="text-3xl font-bold mb-6 text-gray-800">👨‍🍳 Kitchen Dashboard</h4>
 
       {orders.length === 0 ? (
         <p className="text-gray-500">No orders received yet...</p>
@@ -52,13 +69,13 @@ function Kitchen() {
               {order.status === "Pending" && (
                 <div className="mt-3 flex gap-2">
                   <button
-                    onClick={() => updateStatus(index, "Prepared")}
+                    onClick={() => sendStatusUpdate(order, "Prepared")}
                     className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
                   >
                     ✅ Mark Prepared
                   </button>
                   <button
-                    onClick={() => updateStatus(index, "Rejected")}
+                    onClick={() => sendStatusUpdate(order, "Rejected")}
                     className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
                   >
                     ❌ Reject

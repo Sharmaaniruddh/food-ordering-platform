@@ -1,31 +1,38 @@
 // 📁 backend/wsServer.js
 const WebSocket = require("ws");
 
-const wss = new WebSocket.Server({ port: 5001 }); // separate port for WebSocket
-
+const wss = new WebSocket.Server({ port: 5001 });
 console.log("🟢 WebSocket server running on ws://localhost:5001");
 
 let clients = [];
 
 wss.on("connection", (ws) => {
-console.log("🧩 New client connected via WebSocket");
+  console.log("🧩 New client connected via WebSocket");
+  clients.push(ws);
 
-clients.push(ws);
+  ws.on("message", (data) => {
+    const message = JSON.parse(data);
 
-ws.on("close", () => {
-console.log("🔌 Client disconnected");
-clients = clients.filter((client) => client !== ws);
-});
+    if (message.event === "order_updated") {
+      console.log("🔁 Order status updated:", message.data.status);
+      broadcastOrder("order_updated", message.data);
+    }
+  });
+
+  ws.on("close", () => {
+    console.log("🔌 Client disconnected");
+    clients = clients.filter((client) => client !== ws);
+  });
 });
 
 function broadcastOrder(event, data) {
-const message = JSON.stringify({ event, data });
-clients.forEach((client) => {
-if (client.readyState === WebSocket.OPEN) {
-client.send(message);
-}
-});
+  const payload = JSON.stringify({ event, data });
+
+  clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(payload);
+    }
+  });
 }
 
 module.exports = { broadcastOrder };
-

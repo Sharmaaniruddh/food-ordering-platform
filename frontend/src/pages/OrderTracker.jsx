@@ -1,4 +1,3 @@
-// 📁 src/pages/OrderTracker.jsx
 import { useEffect, useState } from "react";
 
 function OrderTracker() {
@@ -13,12 +12,22 @@ function OrderTracker() {
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      console.log("✅ Pushing to state:", message.data);
       console.log("📨 Received message:", message);
 
-      // Expecting: { event: "order_created", data: { name, phone, address, cart, ... } }
       if (message.event === "order_created") {
-        setOrders((prevOrders) => [...prevOrders, message.data]);
+        const newOrder = { ...message.data, status: "Pending" };
+        setOrders((prevOrders) => [...prevOrders, newOrder]);
+      }
+
+      if (message.event === "order_updated") {
+        const updated = message.data;
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.timestamp === updated.timestamp
+              ? { ...order, status: updated.status }
+              : order
+          )
+        );
       }
     };
 
@@ -26,12 +35,12 @@ function OrderTracker() {
       console.log("❌ WebSocket disconnected");
     };
 
-    return () => socket.close(); // Clean up WebSocket on unmount
+    return () => socket.close(); // cleanup
   }, []);
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
-      <h2 className="text-2xl font-bold mb-4">📦 Live Order Tracker</h2>
+      <h4 className="text-2xl font-bold mb-4">📦 Live Order Tracker</h4>
 
       {orders.length === 0 ? (
         <p className="text-gray-500">No orders yet...</p>
@@ -40,7 +49,13 @@ function OrderTracker() {
           {orders.map((order, index) => (
             <div
               key={index}
-              className="bg-white p-4 rounded-lg shadow flex flex-col gap-1 border border-gray-300"
+              className={`bg-white p-4 rounded-lg shadow flex flex-col gap-1 border ${
+                order.status === "Prepared"
+                  ? "border-green-400 bg-green-50"
+                  : order.status === "Rejected"
+                  ? "border-red-400 bg-red-50"
+                  : "border-gray-300"
+              }`}
             >
               <p><strong>Customer:</strong> {order.name}</p>
               <p><strong>Phone:</strong> {order.phone}</p>
@@ -48,7 +63,14 @@ function OrderTracker() {
               <p><strong>Items:</strong>{" "}
                 {order.cart?.map((item) => `${item.name} x${item.qty}`).join(", ")}
               </p>
-              <p><strong>Status:</strong> Pending ⏳</p>
+              <p>
+                <strong>Status:</strong>{" "}
+                {order.status === "Prepared"
+                  ? "✅ Prepared"
+                  : order.status === "Rejected"
+                  ? "❌ Rejected"
+                  : "⏳ Pending"}
+              </p>
             </div>
           ))}
         </div>
@@ -58,4 +80,3 @@ function OrderTracker() {
 }
 
 export default OrderTracker;
-// This component connects to a WebSocket server to receive live order updates.
