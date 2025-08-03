@@ -9,14 +9,14 @@ require("dotenv").config();
 //   port: process.env.DB_PORT || 5432,
 // });
 const pool = new Pool({
-host: process.env.PGHOST,
-user: process.env.PGUSER,
-password: process.env.PGPASSWORD,
-database: process.env.PGDATABASE,
-port: process.env.PGPORT,
-ssl: {
-rejectUnauthorized: false, // required by Render
-},
+  host: process.env.PGHOST,        // Render's internal hostname
+  user: process.env.PGUSER,        // your Render database username
+  password: process.env.PGPASSWORD, // password from Render
+  database: process.env.PGDATABASE, // your database name
+  port: process.env.PGPORT,         // usually 5432
+  ssl: {
+    rejectUnauthorized: false       // required for Render SSL
+  }
 });
 
 module.exports = pool;
