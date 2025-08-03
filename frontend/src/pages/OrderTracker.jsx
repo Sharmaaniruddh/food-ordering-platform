@@ -6,8 +6,10 @@ function OrderTracker() {
 
   useEffect(() => {
     // ✅ Use Docker internal hostname
-    socketRef.current = new WebSocket("ws://localhost:5001");
-
+    // socketRef.current = new WebSocket("ws://localhost:5001");
+    const socket = new WebSocket(process.env.REACT_APP_WS_URL);
+socketRef.current = socket; // ✅ assign the created socket to the ref
+    
     socketRef.current.onopen = () => {
       console.log("📡 Connected to WebSocket server");
     };
