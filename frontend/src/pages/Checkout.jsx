@@ -54,7 +54,7 @@ function Checkout() {
         throw new Error(response.data.error.message);
       }
 
-      alert(`✅ Order #${response.data.result.orderId} placed successfully!`);
+      alert(`✅ Order  placed successfully!`);
       // Reset form after successful submission
       setForm({ name: "", phone: "", address: "" });
     } catch (error) {
