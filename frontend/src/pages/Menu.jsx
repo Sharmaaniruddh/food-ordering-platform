@@ -22,6 +22,7 @@ function Menu() {
         axios.get(`${process.env.REACT_APP_API_BASE}/categories`)
         ]);
         setMenuItems(menuRes.data);
+        console.log("⚠️ categoryRes.data:", categoryRes.data);
         setCategories(categoryRes.data);
       } catch (err) {
         setError("❌ Error loading menu or categories.");
@@ -66,7 +67,7 @@ function Menu() {
             All
           </button>
 
-          {categories.map((cat) => (
+          {Array.isArray(categories) && categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
