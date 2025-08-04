@@ -18,8 +18,8 @@ function Menu() {
         const [menuRes, categoryRes] = await Promise.all([
           // axios.get("http://localhost:5000/menu"),
           // axios.get("http://localhost:5000/categories"),
-        axios.get(`${process.env.REACT_APP_API_BASE}/menu`),
-        axios.get(`${process.env.REACT_APP_API_BASE}/categories`)
+         axios.get(`${import.meta.env.VITE_API_BASE}/menu`),
+          axios.get(`${import.meta.env.VITE_API_BASE}/categories`)
         ]);
         setMenuItems(menuRes.data);
         console.log("⚠️ categoryRes.data:", categoryRes.data);
