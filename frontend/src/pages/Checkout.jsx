@@ -44,7 +44,7 @@ function Checkout() {
     };
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE}/rpc`, orderPayload, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE}/rpc`, orderPayload, {
         headers: {
           "Content-Type": "application/json",
         },
