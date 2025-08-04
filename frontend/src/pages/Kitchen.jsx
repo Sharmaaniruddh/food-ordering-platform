@@ -6,7 +6,8 @@ function Kitchen() {
 
   useEffect(() => {
     // Step 3: connect to backend inside docker using 'backend' hostname
-    const socket = new WebSocket(process.env.REACT_APP_WS_URL);
+   const socket = new WebSocket(import.meta.env.VITE_WS_URL);
+
     socketRef.current = socket;
 
     socketRef.current.onopen = () => console.log("👨‍🍳 Kitchen WebSocket connected");
