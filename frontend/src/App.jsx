@@ -114,6 +114,11 @@ export default function App() {
           <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </main>
+      
+{/* 🔻 Footer with credit */}
+<footer className="text-center text-gray-500 text-sm py-4 border-t mt-12">
+  Developed with ❤️ by <span className="text-blue-600 font-medium">Aniruddh Sharma</span>
+</footer>
     </BrowserRouter>
     
   );
