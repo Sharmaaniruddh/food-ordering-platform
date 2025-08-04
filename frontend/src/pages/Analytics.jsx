@@ -10,7 +10,7 @@ function Analytics() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/admin/stats")
+    axios.get(`${import.meta.env.VITE_API_BASE}/admin/stats`)
       .then((res) => {
         setStats({
           total_orders: Number(res.data.total_orders),
